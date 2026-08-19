@@ -1,0 +1,15 @@
+{
+  "uuid": "kalimulya-aqi@etu",
+  "name": "Kalimulya AQI",
+  "description": "Displays live Air Quality Index (AQI) and pollutant levels for Kalimulya, Depok, Indonesia in the GNOME top bar.",
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "url": "https://github.com/etu/kalimulya-aqi",
+  "version": 1
+}

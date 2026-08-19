@@ -1,0 +1,129 @@
+.aqi-panel-box {
+    spacing: 6px;
+}
+
+.aqi-indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    margin: 4px 2px;
+}
+
+.aqi-panel-label {
+    font-weight: bold;
+}
+
+/* AQI Status Colors */
+.aqi-color-good {
+    background-color: #2ecc71;
+    color: #ffffff;
+}
+
+.aqi-color-moderate {
+    background-color: #f1c40f;
+    color: #1a1a1a;
+}
+
+.aqi-color-sensitive {
+    background-color: #e67e22;
+    color: #ffffff;
+}
+
+.aqi-color-unhealthy {
+    background-color: #e74c3c;
+    color: #ffffff;
+}
+
+.aqi-color-very-unhealthy {
+    background-color: #9b59b6;
+    color: #ffffff;
+}
+
+.aqi-color-hazardous {
+    background-color: #78281f;
+    color: #ffffff;
+}
+
+.aqi-color-unknown {
+    background-color: #7f8c8d;
+    color: #ffffff;
+}
+
+/* Popup Menu Styling */
+.aqi-popup-container {
+    padding: 10px 14px;
+    min-width: 280px;
+    spacing: 10px;
+}
+
+.aqi-header-box {
+    spacing: 2px;
+}
+
+.aqi-header-title {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.aqi-header-subtitle {
+    font-size: 0.85em;
+    color: #a0a0a0;
+}
+
+.aqi-main-card {
+    border-radius: 8px;
+    padding: 10px 12px;
+    spacing: 6px;
+    margin: 4px 0;
+}
+
+.aqi-main-value {
+    font-size: 1.5em;
+    font-weight: 800;
+}
+
+.aqi-main-category {
+    font-size: 1.05em;
+    font-weight: bold;
+}
+
+.aqi-advisory-text {
+    font-size: 0.85em;
+    color: #e0e0e0;
+    margin-top: 4px;
+}
+
+.aqi-section-title {
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #b0b0b0;
+    margin-top: 4px;
+}
+
+.aqi-grid-row {
+    spacing: 8px;
+    margin: 2px 0;
+}
+
+.aqi-pollutant-box {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 6px 8px;
+    spacing: 2px;
+}
+
+.aqi-pollutant-name {
+    font-size: 0.75em;
+    color: #999999;
+}
+
+.aqi-pollutant-val {
+    font-size: 0.95em;
+    font-weight: bold;
+}
+
+.aqi-footer-label {
+    font-size: 0.8em;
+    color: #888888;
+    text-align: center;
+}
