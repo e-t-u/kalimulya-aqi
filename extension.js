@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Pango from 'gi://Pango';
 import Soup from 'gi://Soup';
 import St from 'gi://St';
 
@@ -147,8 +148,10 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
             text: 'Please wait while fetching live observations.',
             style_class: 'aqi-advisory-text',
         });
-        this._aqiAdvisoryLabel.clutter_text.line_wrap = true;
-        this._aqiAdvisoryLabel.clutter_text.line_wrap_mode = Clutter.WrapMode.WORD;
+        if (this._aqiAdvisoryLabel.clutter_text) {
+            this._aqiAdvisoryLabel.clutter_text.line_wrap = true;
+            this._aqiAdvisoryLabel.clutter_text.line_wrap_mode = Pango.WrapMode.WORD;
+        }
 
         this._mainCard.add_child(this._aqiValueLabel);
         this._mainCard.add_child(this._aqiCategoryLabel);
