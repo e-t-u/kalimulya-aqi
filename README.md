@@ -8,14 +8,14 @@ A GNOME Shell extension for GNOME 45+ (including GNOME 46, 47, 48, 49, and 50) t
 - **Detailed Popup Card**:
   - Main AQI status card with category (`Good`, `Moderate`, `Unhealthy for Sensitive Groups`, `Unhealthy`, `Very Unhealthy`, `Hazardous`).
   - Actionable health recommendations & outdoor exertion advisories.
-- **Pollutant Breakdown**:
-  - PM2.5 Fine Particulate Matter ($\mu\text{g/m}^3$)
-  - PM10 Coarse Particulate Matter ($\mu\text{g/m}^3$)
-  - Ozone ($O_3$) ($\mu\text{g/m}^3$)
-  - Nitrogen Dioxide ($NO_2$) ($\mu\text{g/m}^3$)
-  - Sulphur Dioxide ($SO_2$) ($\mu\text{g/m}^3$)
-  - Carbon Monoxide ($CO$) ($\mu\text{g/m}^3$)
-  - European AQI (EAQI)
+- **Pollutant Breakdown (Color-Coded: Green / Orange / Red based on WHO & international guidelines)**:
+  - PM2.5 Fine Particulate Matter ($\mu\text{g/m}^3$) — Green $\le 15$, Orange $\le 35$, Red $> 35$
+  - PM10 Coarse Particulate Matter ($\mu\text{g/m}^3$) — Green $\le 45$, Orange $\le 100$, Red $> 100$
+  - Ozone ($O_3$) ($\mu\text{g/m}^3$) — Green $\le 100$, Orange $\le 160$, Red $> 160$
+  - Nitrogen Dioxide ($NO_2$) ($\mu\text{g/m}^3$) — Green $\le 40$, Orange $\le 100$, Red $> 100$
+  - Sulphur Dioxide ($SO_2$) ($\mu\text{g/m}^3$) — Green $\le 40$, Orange $\le 100$, Red $> 100$
+  - Carbon Monoxide ($CO$) ($\mu\text{g/m}^3$) — Green $\le 4000$, Orange $\le 10000$, Red $> 10000$
+  - European AQI (EAQI) — Green $\le 40$, Orange $\le 60$, Red $> 60$
 - **Zero Configuration**: Uses the Open-Meteo Air Quality API with no API key or subscription needed.
 - **Auto-Refresh**: Automatically updates every 15 minutes in the background, with a manual "Refresh Now" option in the dropdown.
 

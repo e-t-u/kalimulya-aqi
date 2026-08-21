@@ -122,6 +122,26 @@
     font-weight: bold;
 }
 
+/* Pollutant Value Colors (Red, Orange, Green) */
+.aqi-val-good,
+.aqi-val-green {
+    color: #2ecc71;
+}
+
+.aqi-val-moderate,
+.aqi-val-orange {
+    color: #f39c12;
+}
+
+.aqi-val-unhealthy,
+.aqi-val-red {
+    color: #e74c3c;
+}
+
+.aqi-val-unknown {
+    color: #888888;
+}
+
 .aqi-footer-label {
     font-size: 0.8em;
     color: #888888;

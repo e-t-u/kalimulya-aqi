@@ -64,6 +64,64 @@ function getAqiDetails(aqi) {
     }
 }
 
+function getPollutantStatus(type, value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return 'aqi-val-unknown';
+    }
+
+    switch (type) {
+    case 'pm2_5':
+        // WHO 2021: 15 μg/m³ 24h, EPA: 12.0 Good, 35.4 Moderate
+        if (value <= 15) return 'aqi-val-good';
+        if (value <= 35) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'pm10':
+        // WHO 2021: 45 μg/m³ 24h, EPA: 54 Good, 154 Moderate
+        if (value <= 45) return 'aqi-val-good';
+        if (value <= 100) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'o3':
+        // WHO 2021: 100 μg/m³ 8h, EU: 120 μg/m³ target
+        if (value <= 100) return 'aqi-val-good';
+        if (value <= 160) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'no2':
+        // WHO 2021: 25 μg/m³ 24h, EU: 40 μg/m³ annual
+        if (value <= 40) return 'aqi-val-good';
+        if (value <= 100) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'so2':
+        // WHO 2021: 40 μg/m³ 24h, EPA: 90 μg/m³
+        if (value <= 40) return 'aqi-val-good';
+        if (value <= 100) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'co':
+        // WHO 2021: 4000 μg/m³ 24h, EPA: 10000 μg/m³ 8h
+        if (value <= 4000) return 'aqi-val-good';
+        if (value <= 10000) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'eaqi':
+        // European AQI (0-20 Good, 20-40 Fair, 40-60 Moderate, 60-80 Poor, 80+ Very Poor)
+        if (value <= 40) return 'aqi-val-good';
+        if (value <= 60) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    case 'us_aqi':
+        if (value <= 50) return 'aqi-val-good';
+        if (value <= 100) return 'aqi-val-moderate';
+        return 'aqi-val-unhealthy';
+
+    default:
+        return 'aqi-val-unknown';
+    }
+}
+
 const KalimulyaAqiIndicator = GObject.registerClass(
 class KalimulyaAqiIndicator extends PanelMenu.Button {
     _init(extension) {
@@ -178,7 +236,7 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
             });
             const valLbl = new St.Label({
                 text: '--',
-                style_class: 'aqi-pollutant-val',
+                style_class: 'aqi-pollutant-val aqi-val-unknown',
             });
             box.add_child(nameLbl);
             box.add_child(valLbl);
@@ -305,6 +363,13 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
             this._indicatorDot.style_class = 'aqi-indicator-dot aqi-color-unknown';
             this._aqiCategoryLabel.set_text('Failed to fetch data');
             this._aqiAdvisoryLabel.set_text(`Network error: ${error.message}`);
+            this._pm25.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._pm10.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._o3.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._no2.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._so2.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._co.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._eaqi.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
         }
     }
 
@@ -328,22 +393,29 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
         this._aqiCategoryLabel.set_text(details.category);
         this._aqiAdvisoryLabel.set_text(details.advisory);
 
-        // Update Pollutants
-        const formatVal = (val, unit) => {
-            return val !== undefined && val !== null ? `${val.toFixed(1)} ${unit}` : '--';
+        // Update Pollutants with color coding based on recommended thresholds
+        const updatePollutant = (item, type, val, unit) => {
+            const formatted = val !== undefined && val !== null ? `${val.toFixed(1)} ${unit}` : '--';
+            item.valLbl.set_text(formatted);
+            const statusClass = getPollutantStatus(type, val);
+            item.valLbl.style_class = `aqi-pollutant-val ${statusClass}`;
         };
 
-        this._pm25.valLbl.set_text(formatVal(cur.pm2_5, 'μg/m³'));
-        this._pm10.valLbl.set_text(formatVal(cur.pm10, 'μg/m³'));
-        this._o3.valLbl.set_text(formatVal(cur.ozone, 'μg/m³'));
-        this._no2.valLbl.set_text(formatVal(cur.nitrogen_dioxide, 'μg/m³'));
-        this._so2.valLbl.set_text(formatVal(cur.sulphur_dioxide, 'μg/m³'));
-        this._co.valLbl.set_text(formatVal(cur.carbon_monoxide, 'μg/m³'));
+        updatePollutant(this._pm25, 'pm2_5', cur.pm2_5, 'μg/m³');
+        updatePollutant(this._pm10, 'pm10', cur.pm10, 'μg/m³');
+        updatePollutant(this._o3, 'o3', cur.ozone, 'μg/m³');
+        updatePollutant(this._no2, 'no2', cur.nitrogen_dioxide, 'μg/m³');
+        updatePollutant(this._so2, 'so2', cur.sulphur_dioxide, 'μg/m³');
+        updatePollutant(this._co, 'co', cur.carbon_monoxide, 'μg/m³');
 
         if (cur.european_aqi !== undefined && cur.european_aqi !== null) {
-            this._eaqi.valLbl.set_text(`${Math.round(cur.european_aqi)} EAQI`);
+            const eaqiVal = Math.round(cur.european_aqi);
+            this._eaqi.valLbl.set_text(`${eaqiVal} EAQI`);
+            const eaqiStatus = getPollutantStatus('eaqi', eaqiVal);
+            this._eaqi.valLbl.style_class = `aqi-pollutant-val ${eaqiStatus}`;
         } else {
             this._eaqi.valLbl.set_text('--');
+            this._eaqi.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
         }
 
         // Update Timestamp
