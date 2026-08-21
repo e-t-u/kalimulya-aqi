@@ -59,9 +59,18 @@ gnome-extensions enable kalimulya-aqi@etu
 > **Note for Wayland / GNOME Shell**:
 > If this is the first time installing the extension, restart your GNOME session (log out and log back in) so GNOME Shell discovers the new extension directory in `~/.local/share/gnome-shell/extensions/`. On X11, press `Alt+F2`, type `r`, and press Enter.
 
+### Packaging for Distribution
+
+Build a distributable `.zip` archive for extensions.gnome.org or offline installation:
+
+```bash
+make pack
+```
+
 ## Project Structure
 
 - `metadata.json` — Extension metadata, UUID (`kalimulya-aqi@etu`), and supported GNOME Shell versions (45-50).
 - `extension.js` — ESM GNOME Shell extension logic, panel button, popup menu layout, Soup HTTP client, and timer.
 - `stylesheet.css` — Custom CSS classes, color themes, badges, and layout rules for the panel and popup.
-- `install.sh` / `Makefile` — Build and deployment targets.
+- `install.sh` / `Makefile` — Build, packaging, and deployment targets.
+- `.gitignore` — Ignore build zips and editor temp files.

@@ -1,9 +1,13 @@
 UUID = kalimulya-aqi@etu
 DEST = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 
-.PHONY: all install symlink uninstall enable disable restart-gnome clean
+.PHONY: all install symlink pack uninstall enable disable restart-gnome clean
 
 all: install
+
+pack:
+	gnome-extensions pack --force --extra-source=stylesheet.css
+	@echo "Packaged $(UUID).shell-extension.zip"
 
 install:
 	mkdir -p $(DEST)
@@ -27,4 +31,4 @@ uninstall:
 	@echo "Removed $(DEST)"
 
 clean:
-	rm -f *.zip
+	rm -f *.zip *.shell-extension.zip

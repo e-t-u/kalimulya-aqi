@@ -1,0 +1,12 @@
+# Build and packaging artifacts
+*.zip
+*.tar.gz
+*.shell-extension.zip
+
+# System and editor files
+.DS_Store
+*~
+*.swp
+*.swo
+.vscode/
+.idea/
