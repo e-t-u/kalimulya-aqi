@@ -16,6 +16,12 @@ A GNOME Shell extension for GNOME 45+ (including GNOME 46, 47, 48, 49, and 50) t
   - Sulphur Dioxide ($SO_2$) ($\mu\text{g/m}^3$) — Green $\le 40$, Orange $\le 100$, Red $> 100$
   - Carbon Monoxide ($CO$) ($\mu\text{g/m}^3$) — Green $\le 4000$, Orange $\le 10000$, Red $> 10000$
   - European AQI (EAQI) — Green $\le 40$, Orange $\le 60$, Red $> 60$
+- **Allergy & Pollen Outlook (Weather.com / NAB style)**:
+  - Dynamic **Allergy Risk Level** banner (`Low`, `Moderate`, `High`) based on allergen concentration and particulate triggers.
+  - 🌳 **Tree Pollen** (Alder, Birch, Olive) severity & grains/m³
+  - 🌾 **Grass Pollen** severity & grains/m³
+  - 🌿 **Weed Pollen** (Ragweed, Mugwort) severity & grains/m³
+  - 🌪️ **Airborne Dust & Particulate Allergens** severity & $\mu\text{g/m}^3$
 - **Zero Configuration**: Uses the Open-Meteo Air Quality API with no API key or subscription needed.
 - **Auto-Refresh**: Automatically updates every 15 minutes in the background, with a manual "Refresh Now" option in the dropdown.
 

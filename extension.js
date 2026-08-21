@@ -122,6 +122,81 @@ function getPollutantStatus(type, value) {
     }
 }
 
+function getPollenDetails(type, value) {
+    // Standard pollen thresholds (NAB / Weather.com allergy scale)
+    if (value === null || value === undefined || isNaN(value)) {
+        return {
+            level: 'Low (0.0)',
+            styleClass: 'aqi-val-good',
+            severity: 0
+        };
+    }
+
+    switch (type) {
+    case 'tree':
+        // Tree pollen (Alder, Birch, Olive): Low <=15, Mod <=89, High >89 grains/m³
+        if (value <= 15) return {level: `Low · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-good', severity: 0};
+        if (value <= 89) return {level: `Moderate · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-moderate', severity: 1};
+        return {level: `High · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-unhealthy', severity: 2};
+
+    case 'grass':
+        // Grass pollen: Low <=5, Mod <=20, High >20 grains/m³
+        if (value <= 5) return {level: `Low · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-good', severity: 0};
+        if (value <= 20) return {level: `Moderate · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-moderate', severity: 1};
+        return {level: `High · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-unhealthy', severity: 2};
+
+    case 'weed':
+        // Weed / Ragweed pollen: Low <=10, Mod <=49, High >49 grains/m³
+        if (value <= 10) return {level: `Low · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-good', severity: 0};
+        if (value <= 49) return {level: `Moderate · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-moderate', severity: 1};
+        return {level: `High · ${value.toFixed(0)} gr/m³`, styleClass: 'aqi-val-unhealthy', severity: 2};
+
+    case 'dust':
+        // Airborne Dust particulate (μg/m³)
+        if (value <= 25) return {level: `Low · ${value.toFixed(1)} μg/m³`, styleClass: 'aqi-val-good', severity: 0};
+        if (value <= 50) return {level: `Moderate · ${value.toFixed(1)} μg/m³`, styleClass: 'aqi-val-moderate', severity: 1};
+        return {level: `High · ${value.toFixed(1)} μg/m³`, styleClass: 'aqi-val-unhealthy', severity: 2};
+
+    default:
+        return {level: '--', styleClass: 'aqi-val-unknown', severity: 0};
+    }
+}
+
+function getAllergyRisk(treeVal, grassVal, weedVal, dustVal, pm25Val) {
+    const tree = getPollenDetails('tree', treeVal);
+    const grass = getPollenDetails('grass', grassVal);
+    const weed = getPollenDetails('weed', weedVal);
+    const dust = getPollenDetails('dust', dustVal);
+
+    let maxSev = Math.max(tree.severity, grass.severity, weed.severity, dust.severity);
+    if (pm25Val && pm25Val > 35) {
+        maxSev = Math.max(maxSev, 1);
+    }
+    if (pm25Val && pm25Val > 75) {
+        maxSev = Math.max(maxSev, 2);
+    }
+
+    if (maxSev >= 2) {
+        return {
+            label: 'Allergy Risk: High',
+            styleClass: 'aqi-val-unhealthy',
+            cardClass: 'allergy-badge-unhealthy',
+        };
+    } else if (maxSev === 1) {
+        return {
+            label: 'Allergy Risk: Moderate',
+            styleClass: 'aqi-val-moderate',
+            cardClass: 'allergy-badge-moderate',
+        };
+    } else {
+        return {
+            label: 'Allergy Risk: Low',
+            styleClass: 'aqi-val-good',
+            cardClass: 'allergy-badge-good',
+        };
+    }
+}
+
 const KalimulyaAqiIndicator = GObject.registerClass(
 class KalimulyaAqiIndicator extends PanelMenu.Button {
     _init(extension) {
@@ -273,6 +348,40 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
         row4.add_child(this._eaqi.box);
         container.add_child(row4);
 
+        // Allergy & Pollen Forecast Section (Weather.com style)
+        const pollenSectionTitle = new St.Label({
+            text: 'Allergy & Pollen Outlook',
+            style_class: 'aqi-section-title',
+        });
+        container.add_child(pollenSectionTitle);
+
+        this._allergyRiskCard = new St.BoxLayout({
+            vertical: false,
+            style_class: 'aqi-allergy-card allergy-badge-good',
+        });
+        this._allergyRiskLabel = new St.Label({
+            text: 'Allergy Risk: Low',
+            style_class: 'aqi-allergy-risk-title aqi-val-good',
+        });
+        this._allergyRiskCard.add_child(this._allergyRiskLabel);
+        container.add_child(this._allergyRiskCard);
+
+        // Pollen Row 1: Tree & Grass
+        const pRow1 = new St.BoxLayout({style_class: 'aqi-grid-row'});
+        this._treePollen = makePollutantBox('🌳 Tree Pollen');
+        this._grassPollen = makePollutantBox('🌾 Grass Pollen');
+        pRow1.add_child(this._treePollen.box);
+        pRow1.add_child(this._grassPollen.box);
+        container.add_child(pRow1);
+
+        // Pollen Row 2: Weed & Dust
+        const pRow2 = new St.BoxLayout({style_class: 'aqi-grid-row'});
+        this._weedPollen = makePollutantBox('🌿 Weed Pollen');
+        this._dustAllergen = makePollutantBox('🌪️ Airborne Dust');
+        pRow2.add_child(this._weedPollen.box);
+        pRow2.add_child(this._dustAllergen.box);
+        container.add_child(pRow2);
+
         // Footer / Timestamp
         this._updatedLabel = new St.Label({
             text: 'Last updated: Never',
@@ -334,7 +443,7 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
     }
 
     async _fetchAqi() {
-        const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LATITUDE}&longitude=${LONGITUDE}&current=us_aqi,pm2_5,pm10,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide,european_aqi&timezone=Asia%2FJakarta`;
+        const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LATITUDE}&longitude=${LONGITUDE}&current=us_aqi,pm2_5,pm10,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide,european_aqi,dust,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&timezone=Asia%2FJakarta`;
 
         this._panelLabel.set_text('Kalimulya AQI: ...');
 
@@ -370,6 +479,13 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
             this._so2.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
             this._co.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
             this._eaqi.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._treePollen.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._grassPollen.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._weedPollen.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._dustAllergen.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
+            this._allergyRiskLabel.set_text('Allergy Risk: Unknown');
+            this._allergyRiskLabel.style_class = 'aqi-allergy-risk-title aqi-val-unknown';
+            this._allergyRiskCard.style_class = 'aqi-allergy-card';
         }
     }
 
@@ -417,6 +533,45 @@ class KalimulyaAqiIndicator extends PanelMenu.Button {
             this._eaqi.valLbl.set_text('--');
             this._eaqi.valLbl.style_class = 'aqi-pollutant-val aqi-val-unknown';
         }
+
+        // Update Pollen & Allergy Report
+        const hasTreeData = cur.alder_pollen !== null || cur.birch_pollen !== null || cur.olive_pollen !== null;
+        const treePollenVal = hasTreeData ? ((cur.alder_pollen || 0) + (cur.birch_pollen || 0) + (cur.olive_pollen || 0)) : null;
+
+        const grassPollenVal = cur.grass_pollen !== undefined && cur.grass_pollen !== null ? cur.grass_pollen : null;
+
+        const hasWeedData = cur.ragweed_pollen !== null || cur.mugwort_pollen !== null;
+        const weedPollenVal = hasWeedData ? ((cur.ragweed_pollen || 0) + (cur.mugwort_pollen || 0)) : null;
+
+        const dustVal = cur.dust !== undefined && cur.dust !== null ? cur.dust : null;
+
+        const treeDetails = getPollenDetails('tree', treePollenVal);
+        const grassDetails = getPollenDetails('grass', grassPollenVal);
+        const weedDetails = getPollenDetails('weed', weedPollenVal);
+        const dustDetails = getPollenDetails('dust', dustVal);
+
+        this._treePollen.valLbl.set_text(treeDetails.level);
+        this._treePollen.valLbl.style_class = `aqi-pollutant-val ${treeDetails.styleClass}`;
+
+        this._grassPollen.valLbl.set_text(grassDetails.level);
+        this._grassPollen.valLbl.style_class = `aqi-pollutant-val ${grassDetails.styleClass}`;
+
+        this._weedPollen.valLbl.set_text(weedDetails.level);
+        this._weedPollen.valLbl.style_class = `aqi-pollutant-val ${weedDetails.styleClass}`;
+
+        this._dustAllergen.valLbl.set_text(dustDetails.level);
+        this._dustAllergen.valLbl.style_class = `aqi-pollutant-val ${dustDetails.styleClass}`;
+
+        const allergyRisk = getAllergyRisk(
+            treePollenVal,
+            grassPollenVal,
+            weedPollenVal,
+            dustVal,
+            cur.pm2_5
+        );
+        this._allergyRiskLabel.set_text(allergyRisk.label);
+        this._allergyRiskLabel.style_class = `aqi-allergy-risk-title ${allergyRisk.styleClass}`;
+        this._allergyRiskCard.style_class = `aqi-allergy-card ${allergyRisk.cardClass}`;
 
         // Update Timestamp
         const now = new Date();

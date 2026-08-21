@@ -122,7 +122,7 @@
     font-weight: bold;
 }
 
-/* Pollutant Value Colors (Red, Orange, Green) */
+/* Pollutant & Pollen Value Colors (Red, Orange, Green) */
 .aqi-val-good,
 .aqi-val-green {
     color: #2ecc71;
@@ -140,6 +140,34 @@
 
 .aqi-val-unknown {
     color: #888888;
+}
+
+/* Allergy Risk Outlook Card */
+.aqi-allergy-card {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 2px 0 4px 0;
+}
+
+.aqi-allergy-risk-title {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.allergy-badge-good {
+    background-color: rgba(46, 204, 113, 0.15);
+    border: 1px solid rgba(46, 204, 113, 0.35);
+}
+
+.allergy-badge-moderate {
+    background-color: rgba(243, 156, 18, 0.15);
+    border: 1px solid rgba(243, 156, 18, 0.35);
+}
+
+.allergy-badge-unhealthy {
+    background-color: rgba(231, 76, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.35);
 }
 
 .aqi-footer-label {
